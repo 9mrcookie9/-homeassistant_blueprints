@@ -1,0 +1,101 @@
+blueprint:
+  name: 'Remote based light control'
+  description: 'Switch lights based on remote events for three buttons and six lights'
+  domain: automation
+  input:
+    button_entity:
+      name: (Required) Remote action sensor
+      selector:
+        entity:
+          domain: sensor
+    first_single_click:
+      name: First button - single click
+      selector:
+        entity:
+          domain: light
+    first_double_click:
+      name: First button - double click
+      selector:
+        entity:
+          domain: light
+    second_single_click:
+      name: Second button - single click
+      selector:
+        entity:
+          domain: light
+    second_double_click:
+      name: Second button - double click
+      selector:
+        entity:
+          domain: light
+    third_single_click:
+      name: Third button - single click
+      selector:
+        entity:
+          domain: light
+    third_double_click:
+      name: Third button - double click
+      selector:
+        entity:
+          domain: light
+
+# Automation schema
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: state
+    entity_id: !input button_entity
+    attribute: action
+
+variables:
+  first_single_action: "1_single"
+  first_double_action: "1_double"
+  second_single_action: "2_single"
+  second_double_action: "2_double"
+  third_single_action: "3_single"
+  third_double_action: "3_double"
+
+action:
+  - choose:
+      - conditions:
+          - "{{ trigger.to_state.state == first_single_action }}"
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input first_single_click
+
+      - conditions:
+          - "{{ trigger.to_state.state == first_double_action }}"
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input first_double_click
+
+      - conditions:
+          - "{{ trigger.to_state.state == second_single_action }}"
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input second_single_click
+
+      - conditions:
+          - "{{ trigger.to_state.state == second_double_action }}"
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input second_double_click
+
+      - conditions:
+          - "{{ trigger.to_state.state == third_single_action }}"
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input third_single_click
+
+      - conditions:
+          - "{{ trigger.to_state.state == third_double_action }}"
+        sequence:
+          - service: light.toggle
+            target:
+              entity_id: !input third_double_click
