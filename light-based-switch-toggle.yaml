@@ -28,7 +28,6 @@ blueprint:
 trigger:
   - platform: device
     type: changed_states
-    device_id: !input light_entity
     entity_id: !input light_entity
     domain: light
 
@@ -39,14 +38,12 @@ action:
       - conditions:
           - condition: device
             type: is_on
-            device_id: !input switch_entity
             entity_id: !input switch_entity
             domain: switch
           - condition: and
             conditions:
               - condition: device
                 type: is_off
-                device_id: !input light_entity
                 entity_id: !input light_entity
                 domain: light
         sequence:
@@ -56,14 +53,12 @@ action:
       - conditions:
           - condition: device
             type: is_off
-            device_id: !input switch_entity
             entity_id: !input switch_entity
             domain: switch
           - condition: and
             conditions:
               - condition: device
                 type: is_on
-                device_id: !input light_entity
                 entity_id: !input light_entity
                 domain: light
         sequence:
