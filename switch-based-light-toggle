@@ -1,0 +1,59 @@
+blueprint:
+  name: 'Switch Controls Light'
+  description: 'Blueprint to turn on a light based on the switch state'
+  domain: automation
+  input:
+    switch_entity:
+      name: Wall Switch
+      description: 'Select the switch that controls the light'
+      selector:
+        entity:
+          domain: switch
+    light_entity:
+      name: Light
+      description: 'Select the light to control'
+      selector:
+        entity:
+          domain: light
+    delay_time:
+      name: Delay (ms)
+      description: 'Specify delay time in milliseconds before action is taken'
+      default: 750
+      selector:
+        number:
+          min: 0
+          max: 5000
+          unit_of_measurement: ms
+
+trigger:
+  - platform: state
+    entity_id: !input switch_entity
+
+action:
+  - delay:
+      milliseconds: !input delay_time
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: !input switch_entity
+            state: "on"
+          - condition: state
+            entity_id: !input light_entity
+            state: "off"  # Only proceed if the light is off
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light_entity
+      - conditions:
+          - condition: state
+            entity_id: !input switch_entity
+            state: "off"
+          - condition: state
+            entity_id: !input light_entity
+            state: "on"  # Only proceed if the light is on
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: !input light_entity
+
+mode: single
