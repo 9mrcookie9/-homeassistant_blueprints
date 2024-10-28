@@ -10,31 +10,37 @@ blueprint:
           domain: sensor
     first_single_click:
       name: First button - single click
+      default: []
       selector:
         entity:
           domain: light
     first_double_click:
       name: First button - double click
+      default: []
       selector:
         entity:
           domain: light
     second_single_click:
       name: Second button - single click
+      default: []
       selector:
         entity:
           domain: light
     second_double_click:
       name: Second button - double click
+      default: []
       selector:
         entity:
           domain: light
     third_single_click:
       name: Third button - single click
+      default: []
       selector:
         entity:
           domain: light
     third_double_click:
       name: Third button - double click
+      default: []
       selector:
         entity:
           domain: light
