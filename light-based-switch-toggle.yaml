@@ -1,6 +1,6 @@
 blueprint:
-  name: 'Switch follow remotly controlled light'
-  description: 'Blueprint to control a switch  based on the light state.'
+  name: 'Switch Follows Remotely Controlled Light'
+  description: 'Blueprint to control a switch based on the light state.'
   domain: automation
   input:
     switch_entity:
@@ -26,41 +26,31 @@ blueprint:
           unit_of_measurement: ms
 
 trigger:
-  - platform: device
-    type: changed_states
+  - platform: state
     entity_id: !input light_entity
-    domain: light
 
 action:
   - delay:
       milliseconds: !input delay_time
   - choose:
       - conditions:
-          - condition: device
-            type: is_on
+          - condition: state
             entity_id: !input switch_entity
-            domain: switch
-          - condition: and
-            conditions:
-              - condition: device
-                type: is_off
-                entity_id: !input light_entity
-                domain: light
+            state: "on"
+          - condition: state
+            entity_id: !input light_entity
+            state: "off"
         sequence:
           - service: switch.turn_off
             target:
               entity_id: !input switch_entity
       - conditions:
-          - condition: device
-            type: is_off
+          - condition: state
             entity_id: !input switch_entity
-            domain: switch
-          - condition: and
-            conditions:
-              - condition: device
-                type: is_on
-                entity_id: !input light_entity
-                domain: light
+            state: "off"
+          - condition: state
+            entity_id: !input light_entity
+            state: "on"
         sequence:
           - service: switch.turn_on
             target:
