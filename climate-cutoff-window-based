@@ -1,52 +1,71 @@
 blueprint:
-  name: Climate Control Based on Window State with Invert Option
-  description: Switch off climate when a window is open (or closed, if inverted) and turn it back to auto when the state changes.
+  name: Climate Control Based on Window State
+  description: Automation to turn off heating or cooling when a window is open and turn it back on when closed.
   domain: automation
   input:
     climate_entity:
       name: Climate Entity
-      description: The climate device to control
+      description: The climate device (heater or AC) to control.
       selector:
         entity:
           domain: climate
     window_sensor:
       name: Window Sensor
-      description: The binary sensor to monitor window state
+      description: The binary sensor to detect window state (open/closed).
       selector:
         entity:
           domain: binary_sensor
-    invert:
+    invert_logic:
       name: Invert Logic
-      description: Input from binary sensor is inverted.
+      description: Reverses the logic (turn off heating when the window is closed, turn it on when open).
       default: false
       selector:
         boolean:
 
 trigger:
+  # Trigger when the window is open for 15 seconds
   - platform: state
     entity_id: !input window_sensor
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 15
+  # Trigger when the window is closed for 15 seconds
+  - platform: state
+    entity_id: !input window_sensor
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 15
+
+condition: []
 
 action:
   - choose:
-      # Inverted logic
+      # First condition: Turn off the climate device based on normal or inverted logic
       - conditions:
           - condition: template
             value_template: >
-              {{ (is_state(input.window_sensor, 'on') and not input.invert) or 
-                 (is_state(input.window_sensor, 'off') and input.invert) }}
-        sequence:
-          - service: climate.turn_off
-            target:
-              entity_id: !input climate_entity
-      # Normal logic
-      - conditions:
-          - condition: template
-            value_template: >
-              {{ (is_state(input.window_sensor, 'off') and not input.invert) or 
-                 (is_state(input.window_sensor, 'on') and input.invert) }}
+              {{ (is_state(window_sensor, 'on') and not invert_logic) or
+                 (is_state(window_sensor, 'off') and invert_logic) }}
         sequence:
           - service: climate.set_hvac_mode
             target:
               entity_id: !input climate_entity
             data:
-              hvac_mode: auto
+              hvac_mode: 'off'
+      # Second condition: Turn on the climate device in heat mode based on normal or inverted logic
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ (is_state(window_sensor, 'off') and not invert_logic) or
+                 (is_state(window_sensor, 'on') and invert_logic) }}
+        sequence:
+          - service: climate.set_hvac_mode
+            target:
+              entity_id: !input climate_entity
+            data:
+              hvac_mode: heat
+mode: single
