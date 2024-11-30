@@ -1,6 +1,6 @@
 blueprint:
   name: Climate Control Based on Window State
-  description: Automation to turn off heating or cooling when a window is open and turn it back on when closed.
+  description: Automation to turn off the climate device when the window is open and turn it back to heat mode when closed.
   domain: automation
   input:
     climate_entity:
@@ -11,16 +11,10 @@ blueprint:
           domain: climate
     window_sensor:
       name: Window Sensor
-      description: The binary sensor to detect window state (open/closed).
+      description: The binary sensor to detect the window state (open/closed).
       selector:
         entity:
           domain: binary_sensor
-    invert_logic:
-      name: Invert Logic
-      description: Reverses the logic (turn off heating when the window is closed, turn it on when open).
-      default: false
-      selector:
-        boolean:
 
 trigger:
   # Trigger when the window is open for 15 seconds
@@ -44,24 +38,22 @@ condition: []
 
 action:
   - choose:
-      # First condition: Turn off the climate device based on normal or inverted logic
+      # Turn off the climate device when the window is open
       - conditions:
-          - condition: template
-            value_template: >
-              {{ (states(!input window_sensor) == 'on' and not !input invert_logic) or
-                 (states(!input window_sensor) == 'off' and !input invert_logic) }}
+          - condition: state
+            entity_id: !input window_sensor
+            state: 'on'
         sequence:
           - service: climate.set_hvac_mode
             target:
               entity_id: !input climate_entity
             data:
               hvac_mode: 'off'
-      # Second condition: Turn on the climate device in heat mode based on normal or inverted logic
+      # Turn the climate device to heat mode when the window is closed
       - conditions:
-          - condition: template
-            value_template: >
-              {{ (states(!input window_sensor) == 'off' and not !input invert_logic) or
-                 (states(!input window_sensor) == 'on' and !input invert_logic) }}
+          - condition: state
+            entity_id: !input window_sensor
+            state: 'off'
         sequence:
           - service: climate.set_hvac_mode
             target:
