@@ -48,8 +48,8 @@ action:
       - conditions:
           - condition: template
             value_template: >
-              {{ (is_state(window_sensor, 'on') and not invert_logic) or
-                 (is_state(window_sensor, 'off') and invert_logic) }}
+              {{ (states(!input window_sensor) == 'on' and not !input invert_logic) or
+                 (states(!input window_sensor) == 'off' and !input invert_logic) }}
         sequence:
           - service: climate.set_hvac_mode
             target:
@@ -60,8 +60,8 @@ action:
       - conditions:
           - condition: template
             value_template: >
-              {{ (is_state(window_sensor, 'off') and not invert_logic) or
-                 (is_state(window_sensor, 'on') and invert_logic) }}
+              {{ (states(!input window_sensor) == 'off' and not !input invert_logic) or
+                 (states(!input window_sensor) == 'on' and !input invert_logic) }}
         sequence:
           - service: climate.set_hvac_mode
             target:
