@@ -89,42 +89,42 @@ trigger:
 action:
   - choose:
       - conditions:
-          - "{{ trigger.subtype == '1_single' }}"
+          - "{{ trigger.payload == '1_single' }}"
         sequence:
           - service: light.toggle
             target:
               entity_id: !input first_single_click
 
       - conditions:
-          - "{{ trigger.subtype == '1_double' }}"
+          - "{{ trigger.payload == '1_double' }}"
         sequence:
           - service: light.toggle
             target:
               entity_id: !input first_double_click
 
       - conditions:
-          - "{{ trigger.subtype == '2_single' }}"
+          - "{{ trigger.payload == '2_single' }}"
         sequence:
           - service: light.toggle
             target:
               entity_id: !input second_single_click
 
       - conditions:
-          - "{{ trigger.subtype == '2_double' }}"
+          - "{{ trigger.payload == '2_double' }}"
         sequence:
           - service: light.toggle
             target:
               entity_id: !input second_double_click
 
       - conditions:
-          - "{{ trigger.subtype == '3_single' }}"
+          - "{{ trigger.payload == '3_single' }}"
         sequence:
           - service: light.toggle
             target:
               entity_id: !input third_single_click
 
       - conditions:
-          - "{{ trigger.subtype == '3_double' }}"
+          - "{{ trigger.payload == '3_double' }}"
         sequence:
           - service: light.toggle
             target:
